@@ -1,61 +1,74 @@
 .card {
     background-color: var(--surface-card);
-    padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    padding: 2.5rem 2rem;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
 .label {
-    font-weight: 600;
-    font-size: 1.1rem;
+    font-weight: 700;
+    font-size: 1rem;
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     display: block;
+    text-align: left;
 }
 
 .select {
     width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background-color: #f9fafb;
+    padding: 1rem 1.25rem;
+    font-size: 1.05rem;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background-color: #f8fafc;
+    color: #0f172a;
     cursor: pointer;
+    transition: border-color 0.2s ease;
+    appearance: none;
+}
+
+.select:focus {
+    outline: none;
+    border-color: var(--primary-brand);
 }
 
 .button {
     background-color: var(--primary-brand);
     color: white;
     border: none;
-    padding: 1rem;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 50px;
+    padding: 1.1rem;
+    font-size: 1.1rem;
+    font-weight: 800;
+    border-radius: 14px;
     cursor: pointer;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    transition: transform 0.1s ease, background-color 0.2s ease;
     width: 100%;
+    margin-top: 0.5rem;
 }
 
 .button:active {
-    transform: scale(0.98);
+    transform: scale(0.97);
 }
 
 .button:disabled {
-    background-color: #9ca3af;
+    background-color: #94a3b8;
     cursor: not-allowed;
     transform: none;
 }
 
 .error {
-    color: #ef4444;
+    color: #b91c1c;
     font-size: 0.9rem;
+    font-weight: 500;
     text-align: center;
-    background: #fee2e2;
-    padding: 0.75rem;
-    border-radius: 8px;
+    background: #fef2f2;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #fecaca;
 }
