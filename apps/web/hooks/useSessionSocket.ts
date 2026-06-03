@@ -5,7 +5,7 @@ import { Session, VoteType } from '../lib/api';
 
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8080/ws';
 
-export function useSessionSocket(sessionId: string, userId: string) {
+export function useSessionSocket(sessionId: string, userId: string, username: string) {
     const [session, setSession] = useState<Session | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const [isMatch, setIsMatch] = useState(false);
@@ -20,6 +20,14 @@ export function useSessionSocket(sessionId: string, userId: string) {
         socket.onopen = () => {
             console.log('Connected to room:', sessionId);
             setIsConnected(true);
+
+            if (username) {
+                socket.send(JSON.stringify({
+                    action: 'JOIN_ROOM',
+                    user_id: userId,
+                    username: username
+                }));
+            }
         };
 
         socket.onmessage = (event) => {
@@ -44,7 +52,7 @@ export function useSessionSocket(sessionId: string, userId: string) {
         return () => {
             socket.close();
         };
-    }, [sessionId, userId]);
+    }, [sessionId, userId, username]);
 
     const sendSwipe = useCallback((restaurantId: string, vote: VoteType) => {
         if (ws.current && ws.current.readyState === WebSocket.OPEN) {

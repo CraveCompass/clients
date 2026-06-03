@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createSession } from '../lib/api';
 import styles from './CreateRoom.module.css';
@@ -8,10 +8,21 @@ import styles from './CreateRoom.module.css';
 export default function CreateRoom() {
     const router = useRouter();
     const [radius, setRadius] = useState<number>(3000);
+    const [hostName, setHostName] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
+    useEffect(() => {
+        const storedName = sessionStorage.getItem('crave_username');
+        if (storedName) setHostName(storedName);
+    }, []);
+
     const handleStartSession = async () => {
+        if (!hostName.trim()) {
+            setError("Please enter your name first.");
+            return;
+        }
+
         setLoading(true);
         setError(null);
 
@@ -24,8 +35,13 @@ export default function CreateRoom() {
         navigator.geolocation.getCurrentPosition(
             async (position) => {
                 try {
-                    // TODO: In a real app, generate a random ID for the guest or use their JWT
-                    const hostId = "guest_" + Math.random().toString(36).substring(2, 9);
+                    let hostId = sessionStorage.getItem('crave_user_id');
+                    if (!hostId) {
+                        hostId = "user_" + Math.random().toString(36).substring(2, 9);
+                        sessionStorage.setItem('crave_user_id', hostId);
+                    }
+
+                    sessionStorage.setItem('crave_username', hostName.trim());
 
                     const session = await createSession({
                         host_id: hostId,
@@ -52,6 +68,21 @@ export default function CreateRoom() {
     return (
         <div className={styles.card}>
             <div>
+                <label className={styles.label} htmlFor="hostName">Your Name</label>
+                <input
+                    id="hostName"
+                    type="text"
+                    className={styles.select}
+                    placeholder="E.g. Illia"
+                    value={hostName}
+                    onChange={(e) => setHostName(e.target.value)}
+                    disabled={loading}
+                    maxLength={20}
+                    style={{ backgroundColor: '#ffffff' }}
+                />
+            </div>
+
+            <div>
                 <label className={styles.label} htmlFor="radius">Search Radius</label>
                 <select
                     id="radius"
@@ -72,7 +103,7 @@ export default function CreateRoom() {
             <button
                 className={styles.button}
                 onClick={handleStartSession}
-                disabled={loading}
+                disabled={loading || !hostName.trim()}
             >
                 {loading ? "Finding Restaurants..." : "Create a Room"}
             </button>

@@ -11,19 +11,72 @@ export default function RoomPage() {
     const roomId = params.id as string;
 
     const [userId, setUserId] = useState<string>('');
+    const [username, setUsername] = useState<string>('');
+    const [isJoined, setIsJoined] = useState<boolean>(false);
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
-        let storedId = sessionStorage.getItem('crave_user_id');
-        if (!storedId) {
-            storedId = "user_" + Math.random().toString(36).substring(2, 9);
-            sessionStorage.setItem('crave_user_id', storedId);
+        const storedId = sessionStorage.getItem('crave_user_id');
+        const storedName = sessionStorage.getItem('crave_username');
+
+        if (storedId && storedName) {
+            setUserId(storedId);
+            setUsername(storedName);
+            setIsJoined(true);
         }
-        setUserId(storedId);
     }, []);
 
-    const { session, isConnected, isMatch, sendSwipe } = useSessionSocket(roomId, userId);
+    const { session, isConnected, isMatch, sendSwipe } = useSessionSocket(roomId, isJoined ? userId : '', username);
 
-    if (!userId) return null;
+    const handleJoin = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!username.trim()) return;
+
+        const newUserId = "user_" + Math.random().toString(36).substring(2, 9);
+        sessionStorage.setItem('crave_user_id', newUserId);
+        sessionStorage.setItem('crave_username', username.trim());
+
+        setUserId(newUserId);
+        setIsJoined(true);
+    };
+
+    const copyInviteLink = () => {
+        const url = window.location.href;
+        navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    if (!isJoined) {
+        return (
+            <div className={styles.pageWrapper}>
+                <div className={styles.joinOverlay}>
+                    <form className={styles.joinCard} onSubmit={handleJoin}>
+                        <h1 className={styles.joinTitle}>Join Room {roomId.substring(0, 6).toUpperCase()}</h1>
+                        <p style={{ color: '#64748b' }}>Enter your name to start swiping.</p>
+
+                        <input
+                            type="text"
+                            className={styles.joinInput}
+                            placeholder="Your Name"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            autoFocus
+                            maxLength={20}
+                        />
+
+                        <button
+                            type="submit"
+                            className={styles.joinButton}
+                            disabled={!username.trim()}
+                        >
+                            Join the Deck
+                        </button>
+                    </form>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.pageWrapper}>
@@ -33,6 +86,14 @@ export default function RoomPage() {
                     <span className={`${styles.dot} ${isConnected ? styles.connected : ''}`} />
                     {isConnected ? 'Live' : 'Connecting...'}
                 </div>
+
+                <button className={styles.shareButton} onClick={copyInviteLink}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    {copied ? "Copied!" : "Copy Invite Link"}
+                </button>
             </header>
 
             <main className={styles.gameArea}>
@@ -48,9 +109,29 @@ export default function RoomPage() {
                         </svg>
                         <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>We have a winner!</h2>
                         {session?.pool.map(r => r.id === session.matched_id && (
-                            <div key={r.id} style={{ textAlign: 'center' }}>
+                            <div key={r.id} style={{ textAlign: 'center', width: '100%' }}>
                                 <h3 style={{ fontSize: '1.75rem', color: '#ff5a5f', fontWeight: 800, marginBottom: '0.5rem' }}>{r.name}</h3>
-                                <p style={{ color: '#6b7280' }}>{r.cuisine_tags?.join(', ')}</p>
+                                <p style={{ color: '#6b7280', marginBottom: '2rem' }}>{r.cuisine_tags?.join(', ')}</p>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
+                                    <a
+                                        href={`https://www.google.com/maps/dir/?api=1&destination=${r.latitude},${r.longitude}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ backgroundColor: '#10b981', color: 'white', padding: '1rem', borderRadius: '12px', textDecoration: 'none', fontWeight: 800, fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
+                                    >
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                                        </svg>
+                                        Get Directions
+                                    </a>
+                                    <button
+                                        onClick={() => window.location.href = '/'}
+                                        style={{ backgroundColor: 'transparent', color: '#64748b', border: '1px solid #cbd5e1', padding: '1rem', borderRadius: '12px', fontWeight: 700, fontSize: '1rem', cursor: 'pointer' }}
+                                    >
+                                        Leave Room
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
