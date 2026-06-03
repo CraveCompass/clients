@@ -1,3 +1,4 @@
+import CreateRoom from '../components/CreateRoom';
 import styles from './page.module.css';
 
 export default function Home() {
@@ -7,9 +8,8 @@ export default function Home() {
         <h1 className={styles.title}>CraveCompass</h1>
         <p className={styles.subtitle}>Stop arguing. Start eating.</p>
 
-        <button className={styles.button}>
-          Create a Room
-        </button>
+        <CreateRoom />
+
       </div>
     </main>
   );

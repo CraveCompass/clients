@@ -1,0 +1,61 @@
+.card {
+    background-color: var(--surface-card);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.label {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.select {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+    cursor: pointer;
+}
+
+.button {
+    background-color: var(--primary-brand);
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    width: 100%;
+}
+
+.button:active {
+    transform: scale(0.98);
+}
+
+.button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.error {
+    color: #ef4444;
+    font-size: 0.9rem;
+    text-align: center;
+    background: #fee2e2;
+    padding: 0.75rem;
+    border-radius: 8px;
+}
