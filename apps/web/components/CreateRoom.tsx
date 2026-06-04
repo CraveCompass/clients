@@ -11,8 +11,10 @@ export default function CreateRoom() {
     const [hostName, setHostName] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         const storedName = sessionStorage.getItem('crave_username');
         if (storedName) setHostName(storedName);
     }, []);
@@ -103,7 +105,7 @@ export default function CreateRoom() {
             <button
                 className={styles.button}
                 onClick={handleStartSession}
-                disabled={loading || !hostName.trim()}
+                disabled={!isMounted || loading || !hostName.trim()}
             >
                 {loading ? "Finding Restaurants..." : "Create a Room"}
             </button>

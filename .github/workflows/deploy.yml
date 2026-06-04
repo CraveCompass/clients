@@ -34,5 +34,4 @@ jobs:
                       NEXT_PUBLIC_WS_URL=${{ vars.PROD_WS_URL }}
 
             - name: Trigger Dokploy Deployment
-              run: |
-                  curl -X POST -H "Content-Type: application/json" -d '{"branch": "main"}' ${{ secrets.DOKPLOY_WEBHOOK_URL }}
+              run: curl -s -X GET "${{ secrets.DOKPLOY_WEBHOOK_URL }}"

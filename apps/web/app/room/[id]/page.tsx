@@ -6,6 +6,11 @@ import { useSessionSocket } from '../../../hooks/useSessionSocket';
 import SwipeDeck from '../../../components/SwipeDeck';
 import styles from './Room.module.css';
 
+type Participant = {
+    id: string;
+    username: string;
+};
+
 export default function RoomPage() {
     const params = useParams();
     const roomId = params.id as string;
@@ -14,6 +19,10 @@ export default function RoomPage() {
     const [username, setUsername] = useState<string>('');
     const [isJoined, setIsJoined] = useState<boolean>(false);
     const [copied, setCopied] = useState(false);
+
+    const { session, isConnected, isMatch, sendSwipe } = useSessionSocket(roomId, isJoined ? userId : '', username);
+
+    const participants: Participant[] = session?.participants || [];
 
     useEffect(() => {
         const storedId = sessionStorage.getItem('crave_user_id');
@@ -24,9 +33,7 @@ export default function RoomPage() {
             setUsername(storedName);
             setIsJoined(true);
         }
-    }, []);
-
-    const { session, isConnected, isMatch, sendSwipe } = useSessionSocket(roomId, isJoined ? userId : '', username);
+    }, [roomId]);
 
     const handleJoin = (e: React.FormEvent) => {
         e.preventDefault();
@@ -95,6 +102,79 @@ export default function RoomPage() {
                     {copied ? "Copied!" : "Copy Invite Link"}
                 </button>
             </header>
+
+            {participants.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'center', margin: '0.5rem 0 1.5rem 0' }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        backgroundColor: 'white',
+                        padding: '6px 14px',
+                        borderRadius: '9999px',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+                        border: '1px solid #f1f5f9'
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <div style={{
+                                width: '8px',
+                                height: '8px',
+                                backgroundColor: '#10b981',
+                                borderRadius: '50%',
+                                boxShadow: '0 0 0 3px rgba(16, 185, 129, 0.15)'
+                            }} />
+                            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#334155' }}>
+                                {participants.length} Online
+                            </span>
+                        </div>
+
+                        <div style={{ width: '1px', height: '14px', backgroundColor: '#e2e8f0' }} />
+
+                        <div style={{ display: 'flex' }}>
+                            {participants.slice(0, 3).map((user, i) => (
+                                <div key={user.id} title={user.username} style={{
+                                    width: '22px',
+                                    height: '22px',
+                                    borderRadius: '50%',
+                                    background: user.username === username
+                                        ? 'linear-gradient(135deg, #10b981, #059669)'
+                                        : 'linear-gradient(135deg, #6366f1, #4f46e5)',
+                                    color: 'white',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.65rem',
+                                    fontWeight: 'bold',
+                                    border: '2px solid white',
+                                    marginLeft: i > 0 ? '-6px' : '0',
+                                    zIndex: 3 - i
+                                }}>
+                                    {user.username.charAt(0).toUpperCase()}
+                                </div>
+                            ))}
+                            {participants.length > 3 && (
+                                <div style={{
+                                    width: '22px',
+                                    height: '22px',
+                                    borderRadius: '50%',
+                                    backgroundColor: '#f8fafc',
+                                    color: '#64748b',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.6rem',
+                                    fontWeight: 'bold',
+                                    border: '2px solid white',
+                                    marginLeft: '-6px',
+                                    zIndex: 0
+                                }}>
+                                    +{participants.length - 3}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <main className={styles.gameArea}>
                 {isMatch ? (
