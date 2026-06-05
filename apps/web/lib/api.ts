@@ -1,6 +1,6 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
-export type SessionStatus = 'ACTIVE' | 'MATCHED' | 'FINISHED';
+export type SessionStatus = 'ACTIVE' | 'MATCHED' | 'FINISHED' | 'HOST_TIE_BREAKER';
 export type VoteType = 'DISLIKE' | 'LIKE' | 'SUPERLIKE';
 
 export interface Participant {
@@ -41,6 +41,7 @@ export interface Session {
     pool: Restaurant[];
     matched_id?: string;
     votes?: Record<string, Record<string, VoteType>>;
+    tied_ids?: string[];
     created_at: string;
 }
 
