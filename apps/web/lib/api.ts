@@ -8,6 +8,12 @@ export interface Participant {
     username: string;
 }
 
+export interface SessionFilters {
+    price_tiers: number[];
+    min_rating: number;
+    cuisines: string[];
+}
+
 export interface Restaurant {
     id: string;
     osm_id: number;
@@ -22,6 +28,7 @@ export interface Restaurant {
     user_ratings_total?: number;
     price_level?: number;
     photo_reference?: string;
+    opening_hours?: string[];
     formatted_address?: string;
 }
 
@@ -30,6 +37,9 @@ export interface CreateSessionInput {
     latitude: number;
     longitude: number;
     radius_meters: number;
+    priceTiers: number[],
+    minRating: number,
+    cuisines: string[]
 }
 
 export interface Session {
@@ -42,6 +52,7 @@ export interface Session {
     matched_id?: string;
     votes?: Record<string, Record<string, VoteType>>;
     tied_ids?: string[];
+    filters: SessionFilters;
     created_at: string;
 }
 
@@ -60,4 +71,16 @@ export async function createSession(input: CreateSessionInput): Promise<Session>
     }
 
     return response.json();
+}
+
+export async function getTags(): Promise<string[]> {
+    try {
+        const res = await fetch(`${API_URL}/tags`);
+        if (!res.ok) return [];
+        const data = await res.json();
+        return data || []; 
+    } catch (error) {
+        console.error("Failed to fetch tags:", error);
+        return [];
+    }
 }

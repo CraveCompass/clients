@@ -304,7 +304,7 @@ export default function RoomPage() {
                     </div>
 
                 ) : session ? (
-                    <SwipeDeck pool={session.pool} onSwipe={sendSwipe} />
+                    <SwipeDeck pool={session.pool} filters={session.filters} onSwipe={sendSwipe} />
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#6b7280' }}>
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite', marginBottom: '1rem' }}>
