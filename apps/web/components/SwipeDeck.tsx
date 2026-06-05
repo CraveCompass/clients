@@ -1,17 +1,43 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useMotionValue, useTransform, useAnimation, PanInfo, AnimatePresence } from 'framer-motion';
 import { Restaurant, VoteType } from '../lib/api';
 import styles from './SwipeDeck.module.css';
 
 interface SwipeDeckProps {
     pool: Restaurant[];
+    filters?: { price_tiers: number[], min_rating: number, cuisines: string[] };
     onSwipe: (restaurantId: string, vote: VoteType) => void;
 }
 
-export default function SwipeDeck({ pool, onSwipe }: SwipeDeckProps) {
+export default function SwipeDeck({ pool, filters, onSwipe }: SwipeDeckProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
+
+    const topCard = pool && pool.length > 0 ? [...pool].reverse()[currentIndex] : null;
+
+    useEffect(() => {
+        if (!topCard || !filters) return;
+
+        if (topCard.google_place_id) {
+            let shouldSkip = false;
+
+            if (filters.min_rating > 0 && (!topCard.rating || topCard.rating < filters.min_rating)) {
+                shouldSkip = true;
+            }
+            if (filters.price_tiers && filters.price_tiers.length > 0) {
+                const price = topCard.price_level || topCard.price_tier;
+                if (price && !filters.price_tiers.includes(price)) {
+                    shouldSkip = true;
+                }
+            }
+
+            if (shouldSkip) {
+                onSwipe(topCard.id, 'DISLIKE');
+                setCurrentIndex(prev => prev + 1);
+            }
+        }
+    }, [topCard, filters, onSwipe]);
 
     if (!pool || pool.length === 0) {
         return <div className={styles.emptyState}>No restaurants found in this area.</div>;
@@ -26,6 +52,21 @@ export default function SwipeDeck({ pool, onSwipe }: SwipeDeckProps) {
                 </svg>
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827' }}>Out of Cards</h2>
                 <p>Waiting for the group to finish voting...</p>
+            </div>
+        );
+    }
+
+    const hasStrictFilters = filters && (filters.min_rating > 0 || (filters.price_tiers && filters.price_tiers.length > 0));
+    const isWaitingForEnrichment = hasStrictFilters && !topCard?.google_place_id;
+
+    if (isWaitingForEnrichment) {
+        return (
+            <div className={styles.emptyState} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#6b7280' }}>
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: 'spin 1s linear infinite', marginBottom: '1rem' }}>
+                    <line x1="12" y1="2" x2="12" y2="6"></line><line x1="12" y1="18" x2="12" y2="22"></line><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line><line x1="2" y1="12" x2="6" y2="12"></line><line x1="18" y1="12" x2="22" y2="12"></line><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                </svg>
+                <span>Analyzing and filtering restaurants...</span>
+                <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
             </div>
         );
     }
@@ -221,6 +262,27 @@ function SwipeCard({ restaurant, isTop, onSwipe }: SwipeCardProps) {
                             <p style={{ color: '#334155', lineHeight: '1.5', marginBottom: '1.5rem' }}>
                                 {restaurant.formatted_address || "Address not available yet."}
                             </p>
+
+                            {restaurant.opening_hours && restaurant.opening_hours.length > 0 ? (
+                                <>
+                                    <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#64748b', marginBottom: '0.5rem' }}>Opening Hours</h4>
+                                    <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px', color: '#334155', fontSize: '0.9rem', marginBottom: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                        {restaurant.opening_hours.map((day, idx) => {
+                                            const [dayName, times] = day.split(': ');
+                                            return (
+                                                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: idx !== restaurant.opening_hours!.length - 1 ? '1px solid #e2e8f0' : 'none', paddingBottom: idx !== restaurant.opening_hours!.length - 1 ? '0.25rem' : '0' }}>
+                                                    <span style={{ fontWeight: 700, color: '#64748b' }}>{dayName}</span>
+                                                    <span>{times}</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            ) : (
+                                <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px', color: '#94a3b8', fontStyle: 'italic', textAlign: 'center', marginBottom: '1.5rem' }}>
+                                    Hours not available
+                                </div>
+                            )}
 
                             <h4 style={{ fontSize: '1rem', fontWeight: 700, color: '#64748b', marginBottom: '0.5rem' }}>Menu Highlights</h4>
                             <div style={{ padding: '1rem', backgroundColor: '#f8fafc', borderRadius: '12px', color: '#94a3b8', fontStyle: 'italic', textAlign: 'center' }}>
