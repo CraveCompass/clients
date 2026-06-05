@@ -54,18 +54,27 @@ export default function CreateRoom() {
 
                     router.push(`/room/${session.id}`);
 
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } catch (err: any) {
                     setError(err.message || "Failed to connect to the server.");
                     setLoading(false);
                 }
             },
-            (geoError) => {
+            () => {
                 setError("Please allow location access to find nearby restaurants.");
                 setLoading(false);
             },
             { enableHighAccuracy: true, timeout: 10000 }
         );
     };
+
+    if (!isMounted) {
+        return (
+            <div className={styles.card} style={{ minHeight: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#64748b' }}>
+                Loading deck...
+            </div>
+        );
+    }
 
     return (
         <div className={styles.card}>
@@ -93,6 +102,7 @@ export default function CreateRoom() {
                     onChange={(e) => setRadius(Number(e.target.value))}
                     disabled={loading}
                 >
+                    <option value={500}>Corner Walk (500 m)</option>
                     <option value={1000}>Walking Distance (1 km)</option>
                     <option value={3000}>Short Drive (3 km)</option>
                     <option value={5000}>City Wide (5 km)</option>

@@ -18,6 +18,11 @@ export interface Restaurant {
     price_tier: number;
     rating: number;
     created_at: string;
+    google_place_id?: string;
+    user_ratings_total?: number;
+    price_level?: number;
+    photo_reference?: string;
+    formatted_address?: string;
 }
 
 export interface CreateSessionInput {

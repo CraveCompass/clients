@@ -178,24 +178,71 @@ export default function RoomPage() {
 
             <main className={styles.gameArea}>
                 {isMatch ? (
-                    <div className={styles.placeholderCard} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '1rem' }}>
-                            <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
-                            <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
-                            <path d="M4 22h16"></path>
-                            <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
-                            <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
-                            <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
-                        </svg>
-                        <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem' }}>We have a winner!</h2>
+                    <div className={styles.placeholderCard} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem' }}>
+
+                        <h2
+                            style={{
+                                fontSize: '1.75rem',
+                                marginBottom: '1.5rem',
+                                fontWeight: 800,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem'
+                            }}
+                        >
+                            We have a winner!
+
+                            <svg
+                                width="28"
+                                height="28"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#f59e0b"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M8 21h8" />
+                                <path d="M12 17v4" />
+                                <path d="M7 4h10v3a5 5 0 0 1-10 0V4z" />
+                                <path d="M17 5h2a2 2 0 0 1 0 4h-2" />
+                                <path d="M7 5H5a2 2 0 0 0 0 4h2" />
+                            </svg>
+                        </h2>
+
                         {session?.pool.map(r => r.id === session.matched_id && (
                             <div key={r.id} style={{ textAlign: 'center', width: '100%' }}>
+
+                                {r.photo_reference && (
+                                    <div style={{
+                                        width: '100%',
+                                        height: '220px',
+                                        borderRadius: '16px',
+                                        backgroundImage: `url(https://places.googleapis.com/v1/${r.photo_reference}/media?maxHeightPx=800&maxWidthPx=800&key=${process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY})`,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center',
+                                        marginBottom: '1.5rem',
+                                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
+                                    }} />
+                                )}
+
                                 <h3 style={{ fontSize: '1.75rem', color: '#ff5a5f', fontWeight: 800, marginBottom: '0.5rem' }}>{r.name}</h3>
-                                <p style={{ color: '#6b7280', marginBottom: '2rem' }}>{r.cuisine_tags?.join(', ')}</p>
+                                <p style={{ color: '#6b7280', marginBottom: '1rem' }}>{r.cuisine_tags?.join(', ') || r.formatted_address}</p>
+
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '2rem' }}>
+                                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#f59e0b', fontWeight: 700 }}>
+                                        ⭐ {r.rating ? r.rating.toFixed(1) : 'New'}
+                                        {r.user_ratings_total && <span style={{ color: '#9ca3af', fontSize: '0.9rem' }}>({r.user_ratings_total})</span>}
+                                    </span>
+                                    <span style={{ color: '#10b981', fontWeight: 800 }}>
+                                        {Array(r.price_level || r.price_tier || 1).fill('$').join('')}
+                                    </span>
+                                </div>
 
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
                                     <a
-                                        href={`https://www.google.com/maps/dir/?api=1&destination=${r.latitude},${r.longitude}`}
+                                        href={`https://www.google.com/maps/search/?api=1&query=${r.latitude},${r.longitude}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         style={{ backgroundColor: '#10b981', color: 'white', padding: '1rem', borderRadius: '12px', textDecoration: 'none', fontWeight: 800, fontSize: '1.1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.5rem' }}
