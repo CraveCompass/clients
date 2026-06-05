@@ -35,9 +35,8 @@ export function useSessionSocket(sessionId: string, userId: string, username: st
                 const data = JSON.parse(event.data);
                 if (data.event === 'SESSION_UPDATED') {
                     setSession(data.session);
-                    if (data.is_match) {
-                        setIsMatch(true);
-                    }
+
+                    setIsMatch(data.is_match || false);
                 }
             } catch (err) {
                 console.error("Failed to parse websocket message", err);
@@ -67,5 +66,24 @@ export function useSessionSocket(sessionId: string, userId: string, username: st
         }
     }, [userId]);
 
-    return { session, isConnected, isMatch, sendSwipe };
+    const resolveTie = (restaurantId: string) => {
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({
+                action: 'RESOLVE_TIE',
+                user_id: userId,
+                restaurant_id: restaurantId
+            }));
+        }
+    };
+
+    const startSecondRound = () => {
+        if (ws.current?.readyState === WebSocket.OPEN) {
+            ws.current.send(JSON.stringify({
+                action: 'START_SECOND_ROUND',
+                user_id: userId
+            }));
+        }
+    };
+
+    return { session, isConnected, isMatch, sendSwipe, resolveTie, startSecondRound };
 }
