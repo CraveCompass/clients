@@ -102,6 +102,7 @@ export default function CreateRoom() {
                     onChange={(e) => setRadius(Number(e.target.value))}
                     disabled={loading}
                 >
+                    <option value={500}>Corner Walk (500 m)</option>
                     <option value={1000}>Walking Distance (1 km)</option>
                     <option value={3000}>Short Drive (3 km)</option>
                     <option value={5000}>City Wide (5 km)</option>

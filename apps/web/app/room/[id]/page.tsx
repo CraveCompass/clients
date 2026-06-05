@@ -180,7 +180,36 @@ export default function RoomPage() {
                 {isMatch ? (
                     <div className={styles.placeholderCard} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem' }}>
 
-                        <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', fontWeight: 800 }}>We have a winner! 🎉</h2>
+                        <h2
+                            style={{
+                                fontSize: '1.75rem',
+                                marginBottom: '1.5rem',
+                                fontWeight: 800,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '0.5rem'
+                            }}
+                        >
+                            We have a winner!
+
+                            <svg
+                                width="28"
+                                height="28"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="#f59e0b"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <path d="M8 21h8" />
+                                <path d="M12 17v4" />
+                                <path d="M7 4h10v3a5 5 0 0 1-10 0V4z" />
+                                <path d="M17 5h2a2 2 0 0 1 0 4h-2" />
+                                <path d="M7 5H5a2 2 0 0 0 0 4h2" />
+                            </svg>
+                        </h2>
 
                         {session?.pool.map(r => r.id === session.matched_id && (
                             <div key={r.id} style={{ textAlign: 'center', width: '100%' }}>
