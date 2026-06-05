@@ -19,6 +19,7 @@ COPY turbo.json turbo.json
 
 ARG NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_WS_URL
+ARG NEXT_PUBLIC_GOOGLE_PLACES_API_KEY
 
 RUN pnpm turbo run build --filter=web
 
